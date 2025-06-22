@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PeerRoom Study Room</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', Arial, sans-serif;
+            color: #222;
+            background: linear-gradient(120deg, #fffbe7 0%, #ffe066 50%, #b2f7cc 100%);
+            overflow-x: hidden;
+        }
+        .animated-bg {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            z-index: 0;
+            pointer-events: none;
+        }
+        .circle {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.25;
+            animation: float 8s ease-in-out infinite;
+        }
+        .circle1 { width: 180px; height: 180px; background: #ffe066; left: 10vw; top: 10vh; animation-delay: 0s; }
+        .circle2 { width: 120px; height: 120px; background: #b2f7cc; left: 70vw; top: 20vh; animation-delay: 2s; }
+        .circle3 { width: 90px; height: 90px; background: #38b000; left: 50vw; top: 70vh; animation-delay: 4s; }
+        .circle4 { width: 140px; height: 140px; background: #fffbe7; left: 80vw; top: 80vh; animation-delay: 1s; }
+        @keyframes float {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-30px) scale(1.08); }
+        }
+        .container {
+            background: rgba(255,255,255,0.97);
+            padding: 36px 32px 28px 32px;
+            border-radius: 22px;
+            box-shadow: 0 8px 32px rgba(56, 176, 0, 0.10);
+            max-width: 800px;
+            margin: 60px auto 30px auto;
+            position: relative;
+            z-index: 1;
+            border: 1px solid #e3eafc;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 2.1rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, #ffe066, #38b000);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .status {
+            text-align: center;
+            margin-bottom: 18px;
+            font-weight: 500;
+            color: #38b000;
+        }
+        .verification-section {
+            margin: 24px 0 32px 0;
+            padding: 24px 18px;
+            border: 1.5px solid #e3eafc;
+            border-radius: 14px;
+            background: #fffbe7;
+            box-shadow: 0 2px 8px rgba(56, 176, 0, 0.07);
+        }
+        .verification-section h3 {
+            margin-top: 0;
+            font-size: 1.2rem;
+            color: #38b000;
+        }
+        .verified {
+            color: #27ae60;
+            font-weight: bold;
+        }
+        .unverified {
+            color: #e74c3c;
+        }
+        .matched-users {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 18px;
+            margin-bottom: 18px;
+        }
+        .user-card {
+            background: #f7faff;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(56, 176, 0, 0.07);
+            padding: 18px 16px;
+            min-width: 220px;
+            flex: 1 1 220px;
+            border: 1.5px solid #e3eafc;
+            transition: box-shadow 0.2s, transform 0.1s;
+        }
+        .user-card:hover {
+            box-shadow: 0 6px 18px rgba(56, 176, 0, 0.13);
+            transform: translateY(-2px) scale(1.03);
+        }
+        .user-card:nth-child(1) { animation-delay: 0.1s; }
+        .user-card:nth-child(2) { animation-delay: 0.2s; }
+        .user-card:nth-child(3) { animation-delay: 0.3s; }
+        .user-card:nth-child(4) { animation-delay: 0.4s; }
+        .user-card:nth-child(5) { animation-delay: 0.5s; }
+        .user-card h3 {
+            margin-top: 0;
+            color: #28a745;
+            font-size: 1.5em;
+            margin-bottom: 15px;
+        }
+        .user-info {
+            margin: 15px 0;
+        }
+        .user-info p {
+            margin: 8px 0;
+            line-height: 1.4;
+        }
+        .user-info span {
+            font-weight: 600;
+            color: #38b000;
+        }
+        .whatsapp-link {
+            display: inline-block;
+            margin-top: 8px;
+            padding: 7px 16px;
+            background: linear-gradient(90deg, #ffe066, #38b000);
+            color: #222;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: background 0.2s, box-shadow 0.2s;
+            box-shadow: 0 1px 4px rgba(56, 176, 0, 0.10);
+        }
+        .whatsapp-link:hover {
+            background: linear-gradient(90deg, #38b000, #ffe066);
+            box-shadow: 0 2px 8px rgba(56, 176, 0, 0.13);
+        }
+        .back-button {
+            display: inline-block;
+            margin-top: 30px;
+            padding: 10px 24px;
+            background: linear-gradient(90deg, #ffe066, #38b000);
+            color: #222;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 700;
+            transition: background 0.2s, box-shadow 0.2s;
+            box-shadow: 0 1px 4px rgba(56, 176, 0, 0.10);
+        }
+        .back-button:hover {
+            background: linear-gradient(90deg, #38b000, #ffe066);
+            box-shadow: 0 2px 8px rgba(56, 176, 0, 0.13);
+        }
+        .no-matches {
+            text-align: center;
+            color: #888;
+            margin: 18px 0 0 0;
+        }
+        .no-matches ul {
+            list-style: none;
+            padding: 0;
+            margin: 15px 0;
+        }
+        .no-matches li {
+            margin: 10px 0;
+            font-size: 1.1em;
+        }
+        @media (max-width: 900px) {
+            .container {
+                padding: 18px 4vw 18px 4vw;
+                max-width: 98vw;
+            }
+            .matched-users {
+                flex-direction: column;
+                gap: 12px;
+            }
+        }
+        #verificationStatus {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .success {
+            background-color: #dff0d8;
+            color: #3c763d;
+        }
+        .error {
+            background-color: #f2dede;
+            color: #a94442;
+        }
+    </style>
+</head>
+<body>
+    <div class="animated-bg">
+        <div class="circle circle1"></div>
+        <div class="circle circle2"></div>
+        <div class="circle circle3"></div>
+        <div class="circle circle4"></div>
+    </div>
+    <div class="container">
+        <h1>Welcome to Your PeerRoom, {{ name }}!</h1>
+        
+        <div class="status">
+            {% if matched_users %}
+                <p>✅ You have been matched with study partners!</p>
+            {% else %}
+                <p>⏳ No matches found yet. Waiting for others to join...</p>
+            {% endif %}
+        </div>
+
+        <!-- Verification Section -->
+        <div class="verification-section">
+            <h3>ID Card Verification</h3>
+            {% if not current_user.is_verified %}
+                <p>Please verify your identity by uploading your University ID card:</p>
+                <form id="idVerificationForm" enctype="multipart/form-data">
+                    <input type="file" id="idCard" name="id_card" accept="image/*" required>
+                    <button type="button" onclick="verifyID()">Verify ID</button>
+                </form>
+                <div id="verificationStatus"></div>
+            {% else %}
+                <p class="verified">✓ Your identity has been verified</p>
+            {% endif %}
+        </div>
+
+        {% if matched_users %}
+            <div class="matched-users">
+                {% for user in matched_users %}
+                    {% if user.tab_id != current_user.tab_id %}
+                        {% set wa_number = user.whatsapp %}
+                        {% if wa_number|length == 10 and (wa_number.startswith('7') or wa_number.startswith('8') or wa_number.startswith('9')) %}
+                            {% set wa_number = '+91' ~ wa_number %}
+                        {% endif %}
+                    <div class="user-card">
+                        <h3>{{ user.name }}</h3>
+                        <div class="user-info">
+                            <p><span>Year:</span> {{ user.year }}</p>
+                            {% if user.year == "1" %}
+                                <p><span>Subjects:</span> {{ user.subjects }}</p>
+                            {% else %}
+                                <p><span>Specialization:</span> {{ user.specialization }}</p>
+                            {% endif %}
+                            {% if current_user.is_verified and user.is_verified %}
+                                <a href="https://wa.me/{{ wa_number | replace('+', '') }}" class="whatsapp-link" target="_blank">
+                                    Connect on WhatsApp
+                                </a>
+                            {% else %}
+                                <p class="unverified">WhatsApp contact will be visible after both users are verified</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="no-matches">
+                <p>We'll notify you when we find matching study partners based on your preferences:</p>
+                <ul>
+                    <li>Year: {{ current_user.year }}</li>
+                    {% if current_user.year == "1" %}
+                        <li>Subject: {{ current_user.subjects }}</li>
+                    {% else %}
+                        <li>Specialization: {{ current_user.specialization }}</li>
+                    {% endif %}
+                    <li>Group Size Preference: {{ current_user.group_size }} people</li>
+                </ul>
+            </div>
+        {% endif %}
+
+        <div style="text-align: center; margin-top: 30px;">
+            <a href="/" class="back-button">Go Back to Home</a>
+        </div>
+    </div>
+
+    <script>
+        function verifyID() {
+            const fileInput = document.getElementById('idCard');
+            if (!fileInput.files || fileInput.files.length === 0) {
+                document.getElementById('verificationStatus').innerHTML = 
+                    '<p class="error">⚠ Please select a file first</p>';
+                return;
+            }
+            
+            const formData = new FormData();
+            formData.append('id_card', fileInput.files[0]);
+            
+            // Show loading status
+            document.getElementById('verificationStatus').innerHTML = 
+                '<p>Processing... Please wait...</p>';
+            
+            fetch('/verify-id', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                const statusDiv = document.getElementById('verificationStatus');
+                if (data.status === 'success') {
+                    statusDiv.innerHTML = '<p class="success">✓ ID Verified Successfully</p>';
+                    // Refresh the page after 2 seconds to show updated status
+                    setTimeout(() => location.reload(), 2000);
+                } else {
+                    statusDiv.innerHTML = `<p class="error">⚠ ${data.message}</p>`;
+                }
+            })
+            .catch(error => {
+                document.getElementById('verificationStatus').innerHTML = 
+                    '<p class="error">⚠ An error occurred during verification</p>';
+                console.error('Error:', error);
+            });
+        }
+
+        // Auto-refresh to check for updates
+        function checkRoomStatus() {
+            fetch('/room-status')
+            .then(response => response.json())
+            .then(data => {
+                if (data.all_verified) {
+                    // Show all WhatsApp numbers
+                    document.querySelectorAll('.whatsapp.hidden').forEach(el => {
+                        el.classList.remove('hidden');
+                    });
+                }
+            })
+            .catch(error => console.error('Error checking room status:', error));
+        }
+
+        // Check status every 30 seconds
+        setInterval(checkRoomStatus, 30000);
+    </script>
+</body>
+</html>

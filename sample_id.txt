@@ -1,0 +1,7 @@
+BENNETT UNIVERSITY
+STUDENT IDENTIFICATION CARD
+
+Name: John Smith
+Enrollment No: S24CSEU1478
+Course: B.Tech Computer Science
+Valid Till: 2025 

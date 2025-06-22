@@ -1,0 +1,5 @@
+com\studygroup\verification\BennettIDVerifier.class
+com\studygroup\verification\IDVerification.class
+com\studygroup\verification\IDVerificationTest.class
+com\studygroup\verification\VerificationResult.class
+com\studygroup\verification\PythonIDVerifier.class

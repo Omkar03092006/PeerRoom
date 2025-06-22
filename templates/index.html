@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PeerRoom</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', Arial, sans-serif;
+            color: #222;
+            background: linear-gradient(120deg, #fffbe7 0%, #ffe066 50%, #b2f7cc 100%);
+            overflow-x: hidden;
+        }
+        .animated-bg {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            z-index: 0;
+            pointer-events: none;
+        }
+        .circle {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.25;
+            animation: float 8s ease-in-out infinite;
+        }
+        .circle1 { width: 180px; height: 180px; background: #ffe066; left: 10vw; top: 10vh; animation-delay: 0s; }
+        .circle2 { width: 120px; height: 120px; background: #b2f7cc; left: 70vw; top: 20vh; animation-delay: 2s; }
+        .circle3 { width: 90px; height: 90px; background: #38b000; left: 50vw; top: 70vh; animation-delay: 4s; }
+        .circle4 { width: 140px; height: 140px; background: #fffbe7; left: 80vw; top: 80vh; animation-delay: 1s; }
+        @keyframes float {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-30px) scale(1.08); }
+        }
+        .container {
+            background: rgba(255,255,255,0.97);
+            max-width: 420px;
+            width: 100%;
+            margin: 60px auto 40px auto;
+            padding: 36px 32px 28px 32px;
+            border-radius: 22px;
+            box-shadow: 0 8px 32px rgba(56, 176, 0, 0.10);
+            border: 1px solid #e3eafc;
+            position: relative;
+            z-index: 1;
+        }
+        h1 {
+            text-align: center;
+            font-size: 2.3rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, #ffe066, #38b000);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        p {
+            text-align: center;
+            color: #38b000;
+            margin-bottom: 24px;
+            font-weight: 500;
+        }
+        .form-group {
+            margin-bottom: 18px;
+        }
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            color: #3a3a3a;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1.5px solid #d0d8ee;
+            border-radius: 8px;
+            font-size: 1rem;
+            background: #f7faff;
+            transition: border 0.2s, box-shadow 0.2s;
+            outline: none;
+        }
+        input:focus, select:focus {
+            border-color: #ffe066;
+            box-shadow: 0 0 0 2px #b2f7cc;
+        }
+        .error-message {
+            color: #e74c3c;
+            font-size: 0.93rem;
+            margin-top: 2px;
+            display: none;
+        }
+        button[type="submit"] {
+            width: 100%;
+            padding: 12px 0;
+            background: linear-gradient(90deg, #ffe066, #38b000);
+            color: #222;
+            font-size: 1.1rem;
+            font-weight: 700;
+            border: none;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(56, 176, 0, 0.10);
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
+        }
+        button[type="submit"]:hover, button[type="submit"].loading {
+            background: linear-gradient(90deg, #38b000, #ffe066);
+            transform: translateY(-2px) scale(1.03);
+            box-shadow: 0 4px 16px rgba(56, 176, 0, 0.13);
+        }
+        @media (max-width: 600px) {
+            .container {
+                padding: 18px 6vw 18px 6vw;
+                max-width: 98vw;
+            }
+            h1 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+    <script>
+        var socket;
+
+        function connectWebSocket() {
+            socket = new WebSocket("ws://localhost:8080/ws");
+
+            socket.onopen = function () {
+                console.log("Connected to WebSocket server.");
+            };
+
+            socket.onmessage = function (event) {
+                console.log("Notification received:", event.data);
+                showNotification(event.data);
+            };
+
+            socket.onclose = function () {
+                console.log("WebSocket connection closed.");
+            };
+
+            socket.onerror = function (error) {
+                console.error("WebSocket error:", error);
+            };
+        }
+
+        function showNotification(message) {
+            var notification = document.getElementById("notification");
+            notification.innerText = message;
+            notification.style.display = "block";
+
+            setTimeout(function () {
+                notification.style.display = "none";
+            }, 5000); // Hide after 5 seconds
+        }
+
+        window.onload = function () {
+            connectWebSocket();
+        };
+    </script>
+</head>
+<body>
+    <div class="animated-bg">
+        <div class="circle circle1"></div>
+        <div class="circle circle2"></div>
+        <div class="circle circle3"></div>
+        <div class="circle circle4"></div>
+    </div>
+    <div class="container">
+        <h1>Welcome to PeerRoom</h1>
+        <p>Find your perfect study partner!</p>
+        <div id="notification"></div>
+        <form id="registrationForm" action="{{ url_for('submit') }}" method="post" onsubmit="return validateForm()">
+            <div class="form-group">
+                <label for="name">Name:</label>
+                <input type="text" id="name" name="name" required>
+                <div id="nameError" class="error-message"></div>
+            </div>
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required>
+                <div id="emailError" class="error-message"></div>
+            </div>
+            <div class="form-group">
+                <label for="whatsapp">WhatsApp Number:</label>
+                <input type="tel" id="whatsapp" name="whatsapp" pattern="[0-9]{10}" placeholder="10-digit number" required>
+                <div id="whatsappError" class="error-message"></div>
+            </div>
+            <div class="form-group">
+                <label for="year">Year:</label>
+                <select id="year" name="year" required onchange="updateForm()">
+                    <option value="" disabled selected>Select your year</option>
+                    <option value="1">1st Year</option>
+                    <option value="2">2nd Year</option>
+                    <option value="3">3rd Year</option>
+                    <option value="4">4th Year</option>
+                </select>
+            </div>
+            <div id="subjects-div" style="display: none;" class="form-group">
+                <label for="subjects">Subjects:</label>
+                <select id="subjects" name="subjects">
+                    <option value="" disabled selected>Select a subject</option>
+                    <option value="Computational Thinking and Programming">Computational Thinking and Programming</option>
+                    <option value="Engineering Calculus">Engineering Calculus</option>
+                    <option value="Electromagnetics and Mechanics">Electromagnetics and Mechanics</option>
+                    <option value="Object Oriented Programming using Java">Object Oriented Programming using Java</option>
+                    <option value="Digital Design">Digital Design</option>
+                    <option value="Discrete Mathematical Structures">Discrete Mathematical Structures</option>
+                    <option value="Linear Algebra and Ordinary Differential Equations">Linear Algebra and Ordinary Differential Equations</option>
+                    <option value="Introduction to Electrical and Electronics Engineering">Introduction to Electrical and Electronics Engineering</option>
+                </select>
+            </div>
+            <div id="specializations-div" style="display: none;" class="form-group">
+                <label for="specialization">Specialization:</label>
+                <select id="specialization" name="specialization">
+                    <option value="" disabled selected>Select your specialization</option>
+                    <option value="Artificial Intelligence">Artificial Intelligence</option>
+                    <option value="Cloud Computing">Cloud Computing</option>
+                    <option value="Blockchain">Blockchain</option>
+                    <option value="Cyber Security">Cyber Security</option>
+                    <option value="Data Science">Data Science</option>
+                    <option value="Gaming">Gaming</option>
+                    <option value="Robotic Process Automation">Robotic Process Automation</option>
+                    <option value="DevOps">DevOps</option>
+                    <option value="Full Stack">Full Stack</option>
+                    <option value="Drones">Drones</option>
+                    <option value="Quantum Computing">Quantum Computing</option>
+                    <option value="IoT and Robotics">IoT and Robotics</option>
+                    <option value="Augmented & Virtual Reality">Augmented & Virtual Reality</option>
+                    <option value="Product Design Technology">Product Design Technology</option>
+                    <option value="Mobile Technologies">Mobile Technologies</option>
+                    <option value="UI/UX">UI/UX</option>
+                    <option value="General CSE">General CSE - No Specialization</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="group-size">Preferred Number of People in Study Group:</label>
+                <select id="group-size" name="group-size" required>
+                    <option value="" disabled selected>Select group size</option>
+                    <option value="2">2 People</option>
+                    <option value="3">3 People</option>
+                    <option value="4">4 People</option>
+                    <option value="5">5 People</option>
+                </select>
+            </div>
+            <button type="submit" id="submitButton">Find Study Partners</button>
+        </form>
+    </div>
+    <script>
+        function updateForm() {
+            var year = document.getElementById("year").value;
+            var subjectsDiv = document.getElementById("subjects-div");
+            var specializationsDiv = document.getElementById("specializations-div");
+            if (year === "1") {
+                subjectsDiv.style.display = "block";
+                specializationsDiv.style.display = "none";
+                document.getElementById("subjects").required = true;
+                document.getElementById("specialization").required = false;
+            } else if (year === "2" || year === "3" || year === "4") {
+                subjectsDiv.style.display = "none";
+                specializationsDiv.style.display = "block";
+                document.getElementById("subjects").required = false;
+                document.getElementById("specialization").required = true;
+            } else {
+                subjectsDiv.style.display = "none";
+                specializationsDiv.style.display = "none";
+                document.getElementById("subjects").required = false;
+                document.getElementById("specialization").required = false;
+            }
+        }
+        function validateForm() {
+            let isValid = true;
+            const name = document.getElementById("name").value;
+            const email = document.getElementById("email").value;
+            const whatsapp = document.getElementById("whatsapp").value;
+            const year = document.getElementById("year").value;
+            const subjects = document.getElementById("subjects").value;
+            const specialization = document.getElementById("specialization").value;
+            document.getElementById("nameError").style.display = "none";
+            document.getElementById("emailError").style.display = "none";
+            document.getElementById("whatsappError").style.display = "none";
+            if (name.length < 2) {
+                document.getElementById("nameError").textContent = "Name must be at least 2 characters long";
+                document.getElementById("nameError").style.display = "block";
+                isValid = false;
+            }
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                document.getElementById("emailError").textContent = "Please enter a valid email address";
+                document.getElementById("emailError").style.display = "block";
+                isValid = false;
+            }
+            const whatsappRegex = /^[0-9]{10}$/;
+            if (!whatsappRegex.test(whatsapp)) {
+                document.getElementById("whatsappError").textContent = "Please enter a valid 10-digit WhatsApp number";
+                document.getElementById("whatsappError").style.display = "block";
+                isValid = false;
+            }
+            if (year === "1" && !subjects) {
+                alert("Please select a subject for 1st year");
+                isValid = false;
+            }
+            if (year !== "1" && !specialization) {
+                alert("Please select a specialization");
+                isValid = false;
+            }
+            if (isValid) {
+                const submitButton = document.getElementById("submitButton");
+                submitButton.classList.add("loading");
+                submitButton.disabled = true;
+            }
+            return isValid;
+        }
+    </script>
+</body>
+</html>

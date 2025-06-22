@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thank You | PeerRoom</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', Arial, sans-serif;
+            color: #222;
+            background: linear-gradient(120deg, #fffbe7 0%, #ffe066 50%, #b2f7cc 100%);
+            overflow-x: hidden;
+        }
+        .animated-bg {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            z-index: 0;
+            pointer-events: none;
+        }
+        .circle {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.25;
+            animation: float 8s ease-in-out infinite;
+        }
+        .circle1 { width: 180px; height: 180px; background: #ffe066; left: 10vw; top: 10vh; animation-delay: 0s; }
+        .circle2 { width: 120px; height: 120px; background: #b2f7cc; left: 70vw; top: 20vh; animation-delay: 2s; }
+        .circle3 { width: 90px; height: 90px; background: #38b000; left: 50vw; top: 70vh; animation-delay: 4s; }
+        .circle4 { width: 140px; height: 140px; background: #fffbe7; left: 80vw; top: 80vh; animation-delay: 1s; }
+        @keyframes float {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-30px) scale(1.08); }
+        }
+        .container {
+            background: rgba(255,255,255,0.97);
+            max-width: 420px;
+            width: 100%;
+            margin: 60px auto 40px auto;
+            padding: 36px 32px 28px 32px;
+            border-radius: 22px;
+            box-shadow: 0 8px 32px rgba(56, 176, 0, 0.10);
+            border: 1px solid #e3eafc;
+            position: relative;
+            z-index: 1;
+            text-align: center;
+        }
+        h1 {
+            text-align: center;
+            font-size: 2.3rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, #ffe066, #38b000);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        p {
+            text-align: center;
+            color: #38b000;
+            margin-bottom: 24px;
+            font-weight: 500;
+        }
+        #countdown {
+            color: #38b000;
+            font-weight: bold;
+        }
+        .loading {
+            margin: 20px auto;
+            width: 40px;
+            height: 40px;
+            border: 4px solid #ffe066;
+            border-top: 4px solid #38b000;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        @media (max-width: 600px) {
+            .container {
+                padding: 18px 6vw 18px 6vw;
+                max-width: 98vw;
+            }
+            h1 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="animated-bg">
+        <div class="circle circle1"></div>
+        <div class="circle circle2"></div>
+        <div class="circle circle3"></div>
+        <div class="circle circle4"></div>
+    </div>
+    <div class="container">
+        <h1>Thank You, {{ name }}!</h1>
+        <p>Your registration was successful.</p>
+        <div class="loading"></div>
+        <p>Redirecting to your study room in <span id="countdown">3</span> seconds...</p>
+    </div>
+    <script>
+        // Start countdown
+        let count = 3;
+        const countdownElement = document.getElementById('countdown');
+        const countdown = setInterval(() => {
+            count--;
+            countdownElement.textContent = count;
+            if (count <= 0) {
+                clearInterval(countdown);
+                window.location.href = "{{ redirect_url }}";
+            }
+        }, 1000);
+    </script>
+</body>
+</html>
